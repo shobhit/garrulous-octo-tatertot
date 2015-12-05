@@ -1,0 +1,2343 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Garrulous-octo-tatertot by shobhit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Garrulous-octo-tatertot</h1>
+      <h2 class="project-tagline">Thread Concepts</h2>
+      <a href="https://github.com/shobhit/garrulous-octo-tatertot" class="btn">View on GitHub</a>
+      <a href="https://github.com/shobhit/garrulous-octo-tatertot/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/shobhit/garrulous-octo-tatertot/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <p>(Copied from <a href="https://www.gitbook.com/book/hzj163/android-thread/details">https://www.gitbook.com/book/hzj163/android-thread/details</a> since written in Chinese.)</p>
+
+<p>Thread
+The concept of process</p>
+
+<p>  Process is the underlying operating system architecture; is a program being executed; examples of computer program running; an entity processor executed by a processor can be assigned to; the display by a single sequence of execution, a current state and a set of Activities related to system resources unit described. Simply put, when we launch an application, there will be a process. Can be viewed through the Task Manager to the current system which processes. System to process a separate memory space allocated</p>
+
+<p>Thread (Tread)</p>
+
+<p>  Thread, sometimes referred to as lightweight processes (Lightweight Process, LWP), is the smallest unit of program execution flow. A standard thread by the thread ID, the current instruction pointer (PC), a set of registers and stack components. In addition, the thread is in the process of an entity is the basic unit of the system independent scheduling and dispatching, the thread that they do not have the system resources, with only a little in the operation of essential resources, but it can be used with other threads belong to a process sharing process have all the resources. A thread can create and undo another thread can execute concurrently between multiple threads in the same process. Because of mutual restraint between threads, resulting in the thread showing intermittent in operation.</p>
+
+<p>  A program has at least one thread, it is the program itself. A thread is a single sequential program control flow. In a single program to run multiple threads to complete different tasks, called multi-threading.</p>
+
+<p>State of the thread</p>
+
+<p>New state (new)
+Ready state (Runnable)
+Running state (Running)
+Blocking state (Blocked)
+Death state (Dead)
+Thread Synchronization</p>
+
+<p>  Many threads must be considered in the implementation of shared data or coordination among the other thread execution state. This requires synchronization mechanism. In Java, every object has a corresponding lock. But Java does not provide a separate lock and unlock operations. It is implicitly realized by high-level structure, to ensure the corresponding operation. (However, we note that the Java virtual machine to provide separate instructions monito renter and monitorexit to achieve lock and unlock operations.)</p>
+
+<p>  synchronized statement evaluates an object reference, trying to complete the locking operation of the object, and stop processing before the completion of lock operations. When the lock operation is complete synchronized statement body is executed. When a statement body is finished (either normal or abnormal), unlocking is done automatically. As object-oriented languages, synchronized methods often used in conjunction. A better approach is that if a variable is assigned by a thread reference or assignment by the other threads, so access to all of the variables have to be within a certain synchromized statement or synchronized methods.</p>
+
+<p>Android UI in the main thread</p>
+
+<p>  When the application starts, the system creates a main thread (main thread). The main thread is responsible for distributing the event to UI components (including the preparation of the event), also in this main thread, your applications, and Android's UI component interaction occurs. So the main thread that is also called the UI thread UI thread.</p>
+
+<p>  If all of the work in the UI thread, do some of the more time-consuming work such as access to the network or database queries, will block the UI thread, causing the event to stop distribution (including the preparation of events). For users, the application looks like stuck, even worse is that if the UI thread blocked too long (about more than 5 seconds), the user will see the ANR (application not responding) dialog box.</p>
+
+<p>  Andoid UI toolkit is not thread-safe, so you can not from a non-UI thread to manipulate UI components. You have to put all UI operations on UI thread, so single-threaded model for Android has two principles:</p>
+
+<p>Do not block the UI thread.
+Do not access the Android UI toolkit beyond the UI thread (the main components in these two packages: android.widget and android.view).</p>
+
+<p>輸入並搜尋
+Android Thread
+Brief introduction
+1. JAVA thread creation
+2. JAVA cyclic thread
+3. Thread Synchronization JAVA
+4. JAVA thread object copy ThreadLocal
+5. JAVA thread pool
+6. Android messaging
+7. Android messaging communication thread between the thread
+8. Android asynchronous task AsyncTask
+This book uses GitBook release
+Android Thread
+JAVA thread creation
+  In JAVA generally two ways to create a thread</p>
+
+<p>Thread class inheritance, rewrite the run method
+Implement Runnable interface, rewrite the run method
+internal thread run method lifecycle, run method has finished executing, then the end of the thread lifecycle
+Always use the Thread object start the thread start method
+Case inheritance Thread</p>
+
+<pre><code>class  MyRun  extends   Thread
+ {
+     Override 
+    public  void  run ()  {
+
+        for ( int i = 1 ; i &lt;= 100 ; i ++)
+        {
+            try {
+                Thread.sleep ( 5 );
+            } catch (InterruptedException e) {
+                e.printStackTrace ();
+            }
+        }
+    }
+}
+</code></pre>
+
+<p>public  void  btn1 (View View)
+   {</p>
+
+<pre><code>MyRun myRun = new MyRun ();
+myRun.start ();
+</code></pre>
+
+<p>}
+Case implement Runnable Interface</p>
+
+<pre><code>class  MyRun2  implements   Runnable
+ {
+     Override 
+    public  void  run ()  {
+         for ( int i = 1 ; i &lt;= 100 ; i ++)
+        {
+            try {
+                Thread.sleep ( 1000 );
+            } catch (InterruptedException e) {
+                e.printStackTrace ();
+            }
+            Log.i ( "HZJ" , i + "----" );
+        }
+    }
+}
+
+public  void  btn1 (View View)
+</code></pre>
+
+<p>{
+      MyRun2 myRun2 = new MyRun2 ();
+      Thread Thread = new Thread (myRun2);
+      thread.start ();
+  }
+  In JAVA thread object Thread, Thread therefore there are many ways for us to manage threads</p>
+
+<p>Thread.sleep (ms) blocked and can automatically wake
+Thread.currentThread () to get the current thread object
+Thread Status</p>
+
+<p>輸入並搜尋
+Android Thread
+Brief introduction
+1. JAVA thread creation
+2. JAVA cyclic thread
+3. Thread Synchronization JAVA
+4. JAVA thread object copy ThreadLocal
+5. JAVA thread pool
+6. Android messaging
+7. Android messaging communication thread between the thread
+8. Android asynchronous task AsyncTask
+This book uses GitBook release
+Android Thread
+Cycle thread
+  In some cases, do not need to let the thread stopped, or how much time to run a thread delay. So this scenario can use Timer and TimeTask java provide binding process</p>
+
+<p>Timer and TimeTask</p>
+
+<p>  Timer is a timer jdk tool provided, when in use will play a separate thread to perform the specified scheduled task, you can specify the execution once or repeated several times in addition to the main thread. Timer is a thread, using a schedule to complete the TimerTask scheduling method, Timer object to call a schedule is to create a thread, use the Timer cancel () stops operating. Timer executed once after cancel () method, Timer threads are terminated.</p>
+
+<p>  Timer There are two modes of schedule</p>
+
+<p>After the implementation of a number of milliseconds</p>
+
+<p>void schedule (TimerTask, Date)
+void schedule (TimerTask, long)
+How many executed once every millisecond</p>
+
+<p>void schedule (TimerTask, long, long)
+void schedule (TimerTask, Date, long)
+  TimerTask is an abstract class that implements the Runnable interface, on behalf of tasks that can be performed Timer.</p>
+
+<p>Timer object is created</p>
+
+<p>Timer timer;
+// Directly instantiated 
+timer = new Timer ();
+TimeTask object creation</p>
+
+<pre><code>// TimerTask is an abstract class, we need to inherit and implement TimerTask TimerTask run method of 
+class  MyTimerTask  extends  TimerTask  {
+     Override 
+    public  void  run ()  {
+
+    // Here is a new thread
+
+    }
+}
+</code></pre>
+
+<p>Timer object to perform tasks TimeTask</p>
+
+<pre><code>timer = new Timer ();
+ // delay 0 seconds, and executed once every 1000 milliseconds 
+timer.schedule ( new MyTimerTask (), 0 , 1000 );
+
+timer = new Timer ();
+ // delay 1000 seconds after performing 
+timer.schedule ( new MyTimerTask (), 1000 );
+</code></pre>
+
+<p>End Timer thread [If executed executed once every N milliseconds, call cancel () method to end the thread]</p>
+
+<pre><code>// Timer object to close the thread
+timer.cancel ();
+timer = null ;
+</code></pre>
+
+<p>Case combines the android handler []</p>
+
+<p>Package com.hzj163.mythread;</p>
+
+<p>Import android.os.Bundle;
+ Import android.os.Handler;
+ Import android.os.Message;
+ Import android.support.v4.app.Fragment;
+ Import android.view.LayoutInflater;
+ Import android.view.View;
+ Import android.view .ViewGroup;
+ Import android.widget.Button;
+ Import android.widget.TextView;</p>
+
+<p>Import java.text.SimpleDateFormat;
+ Import java.util.Date;
+ Import java.util.Timer;
+ Import java.util.TimerTask;</p>
+
+<p>public  class  F2  extends  Fragment  {
+     // debris view
+    View view;
+    // Fragments of text objects for display once every passing second time
+    TextView textView1;
+    // Start button
+    Button button1;
+    // End button
+    Button button2;
+    // Timer object
+    Timer timer;</p>
+
+<pre><code>// TimerTask is an abstract class, we need to inherit and implement TimerTask TimerTask run method of 
+class  MyTimerTask  extends  TimerTask  {
+     Override 
+    public  void  run ()  {
+         // execute getMyResult () method to get the current date
+        String temp = getMyResult ();
+        // Send a message to the main UI thread handler objects
+        Message message = handler.obtainMessage ();
+        // Set the message data
+        message.obj = temp;
+        // Set the message type 
+        message.what = 1 ;
+         // messaging
+        message.sendToTarget ();
+    }
+}
+
+// Handler object starts waiting for news 
+Handler handler = new Handler () {
+     Override 
+    public  void  handleMessage (Message msg)  {
+         // receive a message to change the UI
+        textView1.setText (msg.obj.toString ());
+    }
+};
+
+
+// Business logic 
+public String getMyResult ()  {
+     // Get the current date 
+    Date Date = new Date ();
+    SimpleDateFormat SimpleDateFormat = new SimpleDateFormat ( "yyyy Year MM month dd day HH: mm: SS" );
+    String result = simpleDateFormat.format (date);
+    return result;
+}
+
+public  void  btn1 (View View)  {
+     // instantiate an object timer 
+    timer = new Timer ();
+     // every one second to perform a task MyTimerTask 
+    timer.schedule ( new MyTimerTask (), 0 , 1000 );
+    button1.setEnabled ( false );
+}
+
+public  void  btn2 (View View)  {
+     // End timer objects thread
+    timer.cancel ();
+    timer = null ;
+    button1.setEnabled ( true );
+}
+
+
+Override 
+public View onCreateView (LayoutInflater inflater, ViewGroup Container,
+                         Bundle savedInstanceState)  {
+     if (View == null ) {
+        View = Inflater.inflate (R.layout.fragment_f2, Container, false );
+        textView1 = (TextView) view.findViewById (R.id.textView1);
+        button1 = (Button) view.findViewById (R.id.button1);
+        button1.setOnClickListener ( new View.OnClickListener () {
+             Override 
+            public  void  onClick (View v)  {
+                btn1 (v);
+            }
+        });
+        button2 = (Button) view.findViewById (R.id.button2);
+        button2.setOnClickListener ( new View.OnClickListener () {
+             Override 
+            public  void  onClick (View v)  {
+                btn2 (v);
+            }
+        });
+    }
+    return View;
+}
+</code></pre>
+
+<p>}</p>
+
+<p>輸入並搜尋
+Android Thread
+Brief introduction
+1. JAVA thread creation
+2. JAVA cyclic thread
+3. Thread Synchronization JAVA
+4. JAVA thread object copy ThreadLocal
+5. JAVA thread pool
+6. Android messaging
+7. Android messaging communication thread between the thread
+8. Android asynchronous task AsyncTask
+This book uses GitBook release
+Android Thread
+Thread thread synchronization [Security]
+  Thread synchronization, referring to the multi-threaded use of shared resources, the program will be wrong in the world, then this error is not thread-safe. Hence the need for thread synchronization process.</p>
+
+<p>  Use thread synchronization lock mechanism to achieve the purpose of thread synchronization.</p>
+
+<p>  JAVA synchronized keyword can be used to achieve code level or method-level synchronization.</p>
+
+<p>  In the synchronization mechanism, ensuring at the same time only one thread access the variable object by locking mechanism. Then the variable is shared by multiple threads, using synchronization mechanisms require careful analysis of program variables when read and write when you need to lock an object, when the object lock release and other complex issues, program design and writing the difficulty is relatively large.</p>
+
+<p>synchronized method level, then the synchronization lock object resides for the current method</p>
+
+<pre><code>    // Method-level synchronization, object lock object for the change method where the 
+    public  synchronized  void  server1 ()
+     {
+
+    }
+</code></pre>
+
+<p>synchronized code level, then the synchronization lock objects to their own definition of</p>
+
+<pre><code>    public  void  server1 ()
+     {
+         // code segment level synchronized lock object is any object 
+        // but need to ensure all calls to this code segment thread, have seen the same object is 
+        synchronized (Object) {
+            // synchronous range
+        }
+    }
+</code></pre>
+
+<p>Case</p>
+
+<p>Package com.hzj163.mythread;
+ Import android.os.Bundle;
+ Import android.os.Handler;
+ Import android.os.Message;
+ Import android.support.v4.app.Fragment;
+ Import android.view.LayoutInflater;
+ Import android.view .view;
+ Import android.view.ViewGroup;
+ Import android.widget.Button;
+ Import android.widget.TextView;
+ Import java.util.Random;
+ Import java.util.Timer;
+ Import java.util.TimerTask;</p>
+
+<p>public  class  F3  extends  Fragment  {
+     // shared resource 
+    int count = 1000 ;
+     // synchronized lock object 
+    Object Object = new Object ();</p>
+
+<pre><code>// Four variables recorded four threads resources obtained 
+int r1 = 0 ;
+ int R2 = 0 ;
+ int r3 = 0 ;
+ int R4 = 0 ;
+
+
+// UI
+View view;
+TextView textView1;
+TextView textView2;
+TextView textView3;
+TextView textView4;
+TextView textView5;
+Button button1;
+// Message Object 
+Handler handler = new Handler () {
+     Override 
+    public  void  handleMessage (Message msg)  {
+         switch (msg.what) {
+             Case  1 :
+                textView1.setText (msg.obj.toString ());
+                r1 = Integer.parseInt (msg.obj.toString ());
+                break ;
+             Case  2 :
+                textView2.setText (msg.obj.toString ());
+                r2 = Integer.parseInt (msg.obj.toString ());
+                break ;
+             Case  3 :
+                textView3.setText (msg.obj.toString ());
+                r3 = Integer.parseInt (msg.obj.toString ());
+                break ;
+             Case  4 :
+                textView4.setText (msg.obj.toString ());
+                r4 = Integer.parseInt (msg.obj.toString ());
+                break ;
+        }
+
+
+        textView5.setText (count + "" );
+         // message object observation resources, if the resource is 0 then initialized 
+        if (count == 0 ) {
+            timer1.cancel ();
+            timer2.cancel ();
+            timer3.cancel ();
+            timer4.cancel ();
+            button1.setEnabled ( true );
+            r1 = 0 ;
+            R2 = 0 ;
+            r3 = 0 ;
+            R4 = 0 ;
+             // replenished resource 
+            count = 1000 ;
+        }
+    }
+};
+
+
+// Four threads
+Timer timer1;
+Timer timer2;
+Timer timer3;
+Timer timer4;
+
+// Perform tasks 
+class  MyTimeTask  extends  TimerTask  {
+     // message type value 
+    int What;
+     // passed in the amount of resources for each task 
+    int rValue;
+
+    public  MyTimeTask ( int What, int rValue)  {
+         this .what = What;
+         this .rValue = rValue;
+
+    }
+
+    Override 
+    public  void  run ()  {
+         // synchronize tasks 
+        synchronized (Object) {
+
+            Analyzing public resources // 
+            if (count&gt; 0 ) {
+                 // add resources
+                rValue ++;
+                // Reduce public resources
+                count--;
+                //Send a message
+                Message message = handler.obtainMessage ();
+                message.what = what;
+                message.obj = rValue;
+                message.sendToTarget ();
+            }
+        }
+    }
+}
+
+
+public  void  btn1 (View View)  {
+
+    // Instantiate thread 
+    Timer1 = new Timer ();
+    Timer2 = new Timer ();
+    timer3 = new Timer ();
+    Timer4 = new Timer ();
+     // random number instantiated, causing the number of milliseconds each thread execution is not the same 
+    Random random = new Random ();
+     int random1 = random.nextInt ( 100 ) + 100 ;
+     int random2 = random .nextInt ( 100 ) + 100 ;
+     int random3 = random.nextInt ( 100 ) + 100 ;
+     int random4 = random.nextInt ( 100 ) + 100 ;
+
+    // Thread starts executing tasks 
+    timer1.schedule ( new MyTimeTask ( 1 , r1), 0 , random1);
+    timer2.schedule ( new MyTimeTask ( 2 , R2), 0 , random2);
+    timer3.schedule ( new MyTimeTask ( 3 , r3), 0 , random3);
+    timer4.schedule ( new MyTimeTask ( 4 , R4), 0 , random4);
+
+    button1.setEnabled ( false );
+}
+
+Override 
+public View onCreateView (LayoutInflater inflater, ViewGroup Container,
+                         Bundle savedInstanceState)  {
+
+    if (View == null ) {
+        View = Inflater.inflate (R.layout.fragment_f3, Container, false );
+        textView1 = (TextView) view.findViewById (R.id.textView1);
+        textView2 = (TextView) view.findViewById (R.id.textView2);
+        textView3 = (TextView) view.findViewById (R.id.textView3);
+        textView4 = (TextView) view.findViewById (R.id.textView4);
+        textView5 = (TextView) view.findViewById (R.id.textView5);
+        button1 = (Button) view.findViewById (R.id.button1);
+        button1.setOnClickListener ( new View.OnClickListener () {
+             Override 
+            public  void  onClick (View v)  {
+                btn1 (v);
+            }
+        });
+    }
+    return View;
+}
+</code></pre>
+
+<p>}</p>
+
+<p>輸入並搜尋
+Android Thread
+Brief introduction
+1. JAVA thread creation
+2. JAVA cyclic thread
+3. Thread Synchronization JAVA
+4. JAVA thread object copy ThreadLocal
+5. JAVA thread pool
+6. Android messaging
+7. Android messaging communication thread between the thread
+8. Android asynchronous task AsyncTask
+This book uses GitBook release
+Android Thread
+ThreadLocal
+  Use ThreadLocal allows object reaches the thread isolation purposes. Use this variable for each thread provides a copy of the variable value, is in a more special Java thread binding mechanism, every thread can independently change their copy, but not copy and other threads conflict.</p>
+
+<p>ThreadLocal common method</p>
+
+<p>Constructor: ThreadLocal (): Creates a thread local variable</p>
+
+<p>protected T initialValue (): Returns the current thread's initial value for this thread-local variable. Called when the maximum at each visit thread to get each thread-local variable this method once, the first time you use the thread get () method to access the variable time. If the thread is set to get first call method (T) method is not called again initialValue method in the thread.</p>
+
+<p>T get ():</p>
+
+<p>void set (T value): the current copy of this thread in the thread-local variable is set to the specified value. Many applications do not require this function, they only rely on initialValue () method to set the value of the thread local variables.</p>
+
+<p>void remove (): remove this thread-local variable. This may help reduce the storage requirements of thread-local variables. If you visit this thread-local variable again, then by default it will have its initialValue.</p>
+
+<p>In the program generally rewrite initialValue method, given a particular initial value.</p>
+
+<p>Note ThreadLocal objects where construction will belong to that thread. Not cross thread calls ThreadLocal objects</p>
+
+<p>Note that all threads finished ThreadLocal objects contained in the time required to reset the properties of an object. ThreadLocal implemented because the method does not clone or copy.</p>
+
+<p>Case [unpackaged]</p>
+
+<p>Boss.java</p>
+
+<p>Package com.hzj163.myhandler;</p>
+
+<p>Import java.util.ArrayList;</p>
+
+<p>// Copy BOSS 
+public  class  Boss  {</p>
+
+<pre><code>// Boss name
+String name;
+// Boss falling equipment
+ArrayList &lt;String&gt; equipment;
+// If death 
+boolean Dead;
+
+public  boolean  isDead ()  {
+     return Dead;
+}
+
+public  void  setDead ( boolean Dead)  {
+     this .dead = Dead;
+}
+
+
+public  Boss ()  {
+}
+
+public String getName ()  {
+     return name;
+}
+
+public  void  setName (String name)  {
+     this .name = name;
+}
+
+public ArrayList &lt;String&gt; getEquipment ()  {
+     return Equipment;
+}
+
+public  void  setEquipment (ArrayList &lt;String&gt; Equipment)  {
+     this .equipment = Equipment;
+}
+</code></pre>
+
+<p>}
+WOWHFB.java</p>
+
+<p>Package com.hzj163.myhandler;</p>
+
+<p>Import java.util.ArrayList;</p>
+
+<p>World of Warcraft heroics // 
+public  class  WOWHFB  {
+     // Copy Name
+    String name;
+    // BOSS List
+    ArrayList  bosses;</p>
+
+<pre><code>public  WOWHFB (String name, ArrayList &lt;Boss&gt; Bosses)  {
+     this .name = name;
+     this .bosses = Bosses;
+}
+
+public  WOWHFB ()  {
+}
+
+public String getName ()  {
+     return name;
+}
+
+public  void  setName (String name)  {
+     this .name = name;
+}
+
+public ArrayList &lt;Boss&gt; getBosses ()  {
+     return Bosses;
+}
+
+public  void  setBosses (ArrayList &lt;Boss&gt; Bosses)  {
+     this .bosses = Bosses;
+}
+</code></pre>
+
+<p>}
+OtherActivity.java</p>
+
+<p>Package com.hzj163.myhandler;
+ Import android.os.Handler;
+ Import android.support.v7.app.AppCompatActivity;
+ Import android.os.Bundle;
+ Import android.view.View;
+ Import android.widget.Button;
+ Import android.widget .TextView;
+ Import java.util.ArrayList;
+ Import java.util.HashSet;
+ Import java.util.Random;</p>
+
+<p>// Here To demonstrate ThreadLocal, so do not do any package 
+public  class  OtherActivity  extends  AppCompatActivity  {</p>
+
+<pre><code>// Copy the object
+WOWHFB wowhfb;
+TextView textView1;
+TextView textView2;
+TextView textView3;
+HandlerMain handler = new Handler ();
+Button button1;
+
+// Manage threads
+HashSet hashSet;
+
+// Synchronization lock 
+Object Object = new Object ();
+
+
+// Initialize copy 
+public WOWHFB initWowhfb ()  {
+     // instantiate a copy of the object [ready to let three teams at the same time enter a copy cut BOSS] 
+    WOWHFB wowhfb = new WOWHFB ();
+    wowhfb.setName ( "Upper Blackrock Spire" );
+
+    // Set BOSS 
+    Boss BOSS1 = new Boss ();
+     // BOSS name 
+    boss1.setName ( "Warlord Zhayi La" );
+     // falling equipment 
+    ArrayList &lt;String&gt; equipment1 = new ArrayList ();
+    equipment1.add ( "Shahram barren Sword" );
+    equipment1.add ( "Fel Shanker" );
+    equipment1.add ( "ember scales Talisman" );
+    equipment1.add ( "Mystery Hood" );
+    equipment1.add ( "dye cream hood" );
+    equipment1.add ( "streamer Hood" );
+    equipment1.add ( "tied Light's mask" );
+     // set equipment
+    boss1.setEquipment (equipment1);
+    // Set the boss whether death 
+    boss1.setDead ( false );
+
+    Boss boss2 = new Boss ();
+    boss2.setName ( "Wild wing anger" );
+    ArrayList &lt;String&gt; equipment2 = new ArrayList ();
+    equipment2.add ( "Black Hand Destruction Halberd" );
+    equipment2.add ( "Wings of Fire tooth anger" );
+    equipment2.add ( "Blast collar" );
+    equipment2.add ( "Burning Blade collar" );
+    equipment2.add ( "cranial tooth necklace" );
+    equipment2.add ( "Indian style necklace" );
+    equipment2.add ( "Magister of the chain" );
+    boss2.setEquipment (equipment2);
+    boss2.setDead ( false );
+
+    Boss boss3 = new Boss ();
+    boss3.setName ( "Commander Sa Beike" );
+    ArrayList &lt;String&gt; equipment3 = new ArrayList ();
+    equipment3.add ( "Sa Beike evil sword" );
+    equipment3.add ( "Sa Beike savage sword" );
+    equipment3.add ( "Sa Beike lucky stone" );
+    equipment3.add ( "Mystery gloves" );
+    equipment3.add ( "dye cream gloves" );
+    equipment3.add ( "streamer gloves" );
+    equipment3.add ( "tied Gloves light" );
+    boss3.setEquipment (equipment3);
+    boss3.setDead ( false );
+
+    Boss BOSS4 = new Boss ();
+    boss4.setName ( "Qi Lake" );
+    ArrayList &lt;String&gt; equipment4 = new ArrayList ();
+    equipment4.add ( "Fink scalpel" );
+    equipment4.add ( "Qi Lake of evil blood potion" );
+    equipment4.add ( "Roger brown diamond signet ring" );
+    equipment4.add ( "Said co-Ming Ring" );
+    equipment4.add ( "Blood spine Ring" );
+    boss4.setEquipment (equipment4);
+    boss4.setDead ( false );
+
+
+    Boss boss5 = new Boss ();
+    boss5.setName ( "iron off by Al Gore Mountain" );
+    ArrayList &lt;String&gt; equipment5 = new ArrayList ();
+    equipment5.add ( "Sinopec hammer" );
+    equipment5.add ( "Union blade cloak" );
+    equipment5.add ( "Marksman cloak" );
+    equipment5.add ( "Violence harmony cloak" );
+    equipment5.add ( "evil bone cloak" );
+    equipment5.add ( "arcane cloak" );
+    boss5.setEquipment (equipment5);
+    boss5.setDead ( false );
+
+
+    // Instantiate BOSS collection 
+    ArrayList &lt;Boss&gt; Bosses = new ArrayList ();
+    bosses.add (boss1);
+    bosses.add (boss2);
+    bosses.add (boss3);
+    bosses.add (boss4);
+    bosses.add (boss5);
+    // Set Boss collection
+    wowhfb.setBosses (bosses);
+
+    return wowhfb;
+}
+
+Override 
+protected  void  onCreate (Bundle savedInstanceState)  {
+     Super .onCreate (savedInstanceState);
+    setContentView (R.layout.activity_other);
+    . getSupportActionBar () setTitle ( "Upper Blackrock Spire" );
+
+    textView1 = (TextView) findViewById (R.id.textView1);
+    textView2 = (TextView) findViewById (R.id.textView2);
+    textView3 = (TextView) findViewById (R.id.textView3);
+    button1 = (Button) findViewById (R.id.button1);
+    // Is responsible for monitoring all the threads end 
+    hashset = new HashSet ();
+     // copy of the object is instantiated
+    wowhfb = initWowhfb ();
+
+}
+
+// Thread 1 
+Runnable runnable1 = new Runnable () {
+     Override 
+    public  void  run ()  {
+         // Add a collection management thread [need to be synchronized, that is multiple threads share a collection} 
+        synchronized (Object) {
+            hashSet.add ( this );
+        }
+        // Start the copy, using ThreadLocal isolation WOWHFB objects 
+        ThreadLocal &lt;WOWHFB&gt; threadLocal = new ThreadLocal () {
+             // initialization copy 
+            Override 
+            protected Object initialValue ()  {
+                 return wowhfb;
+            }
+        };
+
+        // Fight ...... 
+        handlerMain.post ( new Runnable () {
+             Override 
+            public  void  run ()  {
+                textView1.setText ( "1 start fighting team" );
+            }
+        });
+        try {
+            Thread.sleep ( ten thousand );
+        } catch (InterruptedException e) {
+            e.printStackTrace ();
+        }
+        // End the fighting Usage threadLocal.get () took a copy of the object]
+        WOWHFB temp = threadLocal.get ();
+        // Killed two BOSS 
+        temp.getBosses () get (. 0 ) .setDead ( true );
+        . temp.getBosses () get ( 1 ) .setDead ( true );
+         // Trophy 
+        ArrayList &lt;String&gt; result = new ArrayList ();
+         // get equipment 
+        Random random = new Random ();
+         // random get equipment 
+        int randomTemp1 = random.nextInt (temp.getBosses () get (. 0 ) .getEquipment () size ().);
+         int randomTemp2 = random.nextInt (. temp.getBosses () get ( 1 .) .getEquipment () size ()) ;
+        result.add (. temp.getBosses () get ( 0 .) .getEquipment () get (randomTemp1));
+        result.add (temp.getBosses () get (. 1 ) .getEquipment () get (randomTemp2).);
+         // gather information 
+        Final StringBuffer stringBuffer = new StringBuffer ();
+        StringBuffer.append ( "clan *** *** 1 kill BOSS" );
+        StringBuffer.append ( "\ r \ N" );
+         for ( int i = 0 ; i &lt;temp.getBosses () size ();. i ++) {
+             if . (temp.getBosses () get (i) .isDead () ) {
+                stringBuffer.append (temp.getBosses () get (i) .getName ().);
+                StringBuffer.append ( "\ r \ N" );
+            }
+        }
+        StringBuffer.append ( "booty *** ***" );
+        StringBuffer.append ( "\ r \ N" );
+         for ( int i = 0 ; i &lt;result.size (); i ++) {
+            stringBuffer.append (result.get (i));
+            StringBuffer.append ( "\ r \ N" );
+        }
+
+        Thread {// Add a collection management need to be synchronized, that is multiple threads share a collection} 
+        synchronized (Object) {
+            hashSet.remove ( this );
+        }
+        // Display the trophy 
+        handlerMain.post ( new Runnable () {
+             Override 
+            public  void  run ()  {
+                textView1.setText (stringBuffer.toString ());
+
+                // Determine whether all threads end 
+                if (hashSet.isEmpty ()) {
+                    button1.setEnabled ( true );
+
+                    // Here we must note that the ThreadLocal object does not clone program to clone multiple copies of an object 
+                    // copy of the object is actually still is one, so after the end of all threads, you need to reset the copy of the object
+                    wowhfb = initWowhfb ();
+
+
+                }
+            }
+        });
+    }
+};
+Thread 2 // 
+Runnable runnable2 = new Runnable () {
+
+    Override 
+    public  void  run ()  {
+
+        synchronized (Object) {
+            hashSet.add ( this );
+        }
+
+        // Start the copy, using ThreadLocal isolation WOWHFB objects 
+        ThreadLocal &lt;WOWHFB&gt; threadLocal = new ThreadLocal () {
+             // initialization copy 
+            Override 
+            protected Object initialValue ()  {
+                 return wowhfb;
+            }
+        };
+
+        handlerMain.post ( new Runnable () {
+             Override 
+            public  void  run ()  {
+                textView2.setText ( "clan began fighting 2" );
+            }
+        });
+        // Fight ...... 
+        try {
+            Thread.sleep ( 5000 );
+        } catch (InterruptedException e) {
+            e.printStackTrace ();
+        }
+        // End fighting
+        WOWHFB temp = threadLocal.get ();
+        // Killed two BOSS 
+        temp.getBosses () get (. 0 ) .setDead ( true );
+         // Trophy 
+        ArrayList &lt;String&gt; result = new ArrayList ();
+         // get equipment 
+        Random random = new Random ();
+         // random get equipment 
+        int randomTemp1 = random.nextInt (temp.getBosses () get (. 0 ) .getEquipment () size ().);
+        result.add (. temp.getBosses () get ( 0 .) .getEquipment () get (randomTemp1));
+
+
+        // Gathering information 
+        Final StringBuffer stringBuffer = new StringBuffer ();
+        StringBuffer.append ( "clan *** 2 *** BOSS kill" );
+        StringBuffer.append ( "\ r \ N" );
+         for ( int i = 0 ; i &lt;temp.getBosses () size ();. i ++) {
+             if . (temp.getBosses () get (i) .isDead () ) {
+                stringBuffer.append (temp.getBosses () get (i) .getName ().);
+                StringBuffer.append ( "\ r \ N" );
+            }
+        }
+        StringBuffer.append ( "booty *** ***" );
+        StringBuffer.append ( "\ r \ N" );
+         for ( int i = 0 ; i &lt;result.size (); i ++) {
+            stringBuffer.append (result.get (i));
+            StringBuffer.append ( "\ r \ N" );
+        }
+
+
+        synchronized (Object) {
+            hashSet.remove ( this );
+        }
+
+        // Display the trophy 
+        handlerMain.post ( new Runnable () {
+             Override 
+            public  void  run ()  {
+                textView2.setText (stringBuffer.toString ());
+
+                // Determine whether all threads end 
+                if (hashSet.isEmpty ()) {
+                    button1.setEnabled ( true );
+                    wowhfb = initWowhfb ();
+                }
+
+            }
+        });
+
+
+    }
+};
+
+// Thread 3 
+Runnable runnable3 = new Runnable () {
+
+    Override 
+    public  void  run ()  {
+
+        synchronized (Object) {
+            hashSet.add ( this );
+        }
+
+
+        // Start the copy, using ThreadLocal isolation WOWHFB objects 
+        ThreadLocal &lt;WOWHFB&gt; threadLocal = new ThreadLocal () {
+             // initialization copy 
+            Override 
+            protected Object initialValue ()  {
+                 return wowhfb;
+            }
+        };
+
+        handlerMain.post ( new Runnable () {
+             Override 
+            public  void  run ()  {
+                textView3.setText ( "clan fighting began 3" );
+            }
+        });
+
+        // Fight ...... 
+        try {
+            Thread.sleep ( 20,000 );
+        } catch (InterruptedException e) {
+            e.printStackTrace ();
+        }
+        // End fighting
+        WOWHFB temp = threadLocal.get ();
+        // Killed two BOSS 
+        temp.getBosses () get (. 0 ) .setDead ( true );
+        . temp.getBosses () get ( 1 ) .setDead ( true );
+        . temp.getBosses () get ( 2 ) .setDead ( true );
+        . temp.getBosses () get ( 3 ) .setDead ( true );
+        . temp.getBosses () get ( 4 ) .setDead ( true );
+
+        // Trophy 
+        ArrayList &lt;String&gt; result = new ArrayList ();
+         // get equipment 
+        Random random = new Random ();
+         // random get equipment 
+        int randomTemp1 = random.nextInt (temp.getBosses () get (. 0 ) .getEquipment () .size ());
+
+        int randomTemp2 = random.nextInt (. temp.getBosses () get ( 1 .) .getEquipment () size ());
+
+        int randomTemp3 = random.nextInt (. temp.getBosses () get ( 2 .) .getEquipment () size ());
+
+        int randomTemp4 = random.nextInt (temp.getBosses () get (. 3 ) .getEquipment () size ().);
+
+        int randomTemp5 = random.nextInt (temp.getBosses () get (. 4 ) .getEquipment () size ().);
+
+        result.add (. temp.getBosses () get ( 0 .) .getEquipment () get (randomTemp1));
+        result.add (. temp.getBosses () get ( 1 ) .getEquipment () get (randomTemp2).);
+        result.add (. temp.getBosses () get ( 2 ) .getEquipment () get (randomTemp3).);
+        result.add (. temp.getBosses () get ( 3 ) .getEquipment () get (randomTemp4).);
+        result.add (. temp.getBosses () get ( 4 ) .getEquipment () get (randomTemp5).);
+
+
+        // Gathering information 
+        Final StringBuffer stringBuffer = new StringBuffer ();
+        StringBuffer.append ( "clan *** *** 3 killed BOSS" );
+        StringBuffer.append ( "\ r \ N" );
+         for ( int i = 0 ; i &lt;temp.getBosses () size ();. i ++) {
+             if . (temp.getBosses () get (i) .isDead () ) {
+                stringBuffer.append (temp.getBosses () get (i) .getName ().);
+                StringBuffer.append ( "\ r \ N" );
+            }
+        }
+        StringBuffer.append ( "booty *** ***" );
+        StringBuffer.append ( "\ r \ N" );
+         for ( int i = 0 ; i &lt;result.size (); i ++) {
+            stringBuffer.append (result.get (i));
+            StringBuffer.append ( "\ r \ N" );
+        }
+
+
+        synchronized (Object) {
+            hashSet.remove ( this );
+        }
+
+
+        // Display the trophy 
+        handlerMain.post ( new Runnable () {
+             Override 
+            public  void  run ()  {
+                textView3.setText (stringBuffer.toString ());
+                // Determine whether all threads end 
+                if (hashSet.isEmpty ()) {
+                    button1.setEnabled ( true );
+                    wowhfb = initWowhfb ();
+
+                }
+            }
+        });
+    }
+};
+
+
+public  void  btn1 (View View)  {
+
+    new Thread (runnable1) .start ();
+     new Thread (runnable2) .start ();
+     new Thread (runnable3) .start ();
+    button1.setEnabled ( false );
+}
+</code></pre>
+
+<p>}
+[Package version, beans unchanged]</p>
+
+<p>Package com.hzj163.myhandler;</p>
+
+<p>Import android.os.Handler;
+ Import android.os.Message;
+ Import android.support.v7.app.AppCompatActivity;
+ Import android.os.Bundle;
+ Import android.view.Menu;
+ Import android.view.MenuItem;
+ Import android.view .view;
+ Import android.widget.Button;
+ Import android.widget.Switch;
+ Import android.widget.TextView;</p>
+
+<p>Import java.lang.ref.WeakReference;
+ Import java.util.ArrayList;
+ Import java.util.HashSet;
+ Import java.util.Random;</p>
+
+<p>// Packaged version 
+public  class  OtherActivity1  extends  AppCompatActivity  {
+     // 1 team began 
+    public  static  Final  int START_1 = 1 ;
+     // 2 clan began 
+    public  static  Final  int START_2 = 2 ;
+     // 3 team began 
+    public  static  Final  int START_3 = 3 ;
+     / / 1 team ended 
+    public  static  Final  int END_1 = 4 ;
+     // 2 teams end 
+    public  static  Final  int END_2 = 5 ;
+     // 3 team ended 
+    public  static  Final  int END_3 = 6 ;</p>
+
+<pre><code>// Copy the object
+WOWHFB wowhfb;
+TextView textView1;
+TextView textView2;
+TextView textView3;
+
+
+Button button1;
+// Manage threads
+HashSet hashSet;
+// Synchronization lock 
+Object Object = new Object ();
+
+
+Override 
+protected  void  onCreate (Bundle savedInstanceState)  {
+     Super .onCreate (savedInstanceState);
+    setContentView (R.layout.activity_other);
+    . getSupportActionBar () setTitle ( "Upper Blackrock Spire" );
+    textView1 = (TextView) findViewById (R.id.textView1);
+    textView2 = (TextView) findViewById (R.id.textView2);
+    textView3 = (TextView) findViewById (R.id.textView3);
+    button1 = (Button) findViewById (R.id.button1);
+    // Is responsible for monitoring all the threads end 
+    hashset = new HashSet ();
+    wowhfb = initWowhfb ();
+
+}
+
+
+// Main thread handler 
+MyHandler handlerMain = new MyHandler ( new WeakReference &lt;OtherActivity1&gt; (OtherActivity1. this ));
+
+static  class  MyHandler  extends  Handler  {
+    WeakReference &lt;OtherActivity1&gt; weakReference;
+
+    public  MyHandler (WeakReference &lt;OtherActivity1&gt; WeakReference)  {
+         this .weakReference = WeakReference;
+    }
+
+    Override 
+    public  void  handleMessage (Message msg)  {
+        OtherActivity1 temp = weakReference.get ();
+        switch (msg.what) {
+             Case START_1:
+                temp.textView1.setText ( "1 start fighting team" );
+                 break ;
+             Case START_2:
+                temp.textView2.setText ( "clan began fighting 2" );
+                 break ;
+             Case START_3:
+                temp.textView3.setText ( "clan fighting began 3" );
+                 break ;
+             Case END_1:
+                temp.textView1.setText (msg.obj.toString ());
+                temp.reFB ();
+                break ;
+             Case END_2:
+                temp.textView2.setText (msg.obj.toString ());
+                temp.reFB ();
+                break ;
+             Case END_3:
+                temp.textView3.setText (msg.obj.toString ());
+                temp.reFB ();
+                break ;
+        }
+    }
+}
+
+
+// Initialize copy 
+public WOWHFB initWowhfb ()  {
+     // instantiate a copy of the object [ready to let three teams at the same time enter a copy cut BOSS] 
+    WOWHFB wowhfb = new WOWHFB ();
+    wowhfb.setName ( "Upper Blackrock Spire" );
+
+    // Set BOSS 
+    Boss BOSS1 = new Boss ();
+     // BOSS name 
+    boss1.setName ( "Warlord Zhayi La" );
+     // falling equipment 
+    ArrayList &lt;String&gt; equipment1 = new ArrayList ();
+    equipment1.add ( "Shahram barren Sword" );
+    equipment1.add ( "Fel Shanker" );
+    equipment1.add ( "ember scales Talisman" );
+    equipment1.add ( "Mystery Hood" );
+    equipment1.add ( "dye cream hood" );
+    equipment1.add ( "streamer Hood" );
+    equipment1.add ( "tied Light's mask" );
+     // set equipment
+    boss1.setEquipment (equipment1);
+    // Set the boss whether death 
+    boss1.setDead ( false );
+
+    Boss boss2 = new Boss ();
+    boss2.setName ( "Wild wing anger" );
+    ArrayList &lt;String&gt; equipment2 = new ArrayList ();
+    equipment2.add ( "Black Hand Destruction Halberd" );
+    equipment2.add ( "Wings of Fire tooth anger" );
+    equipment2.add ( "Blast collar" );
+    equipment2.add ( "Burning Blade collar" );
+    equipment2.add ( "cranial tooth necklace" );
+    equipment2.add ( "Indian style necklace" );
+    equipment2.add ( "Magister of the chain" );
+    boss2.setEquipment (equipment2);
+    boss2.setDead ( false );
+
+    Boss boss3 = new Boss ();
+    boss3.setName ( "Commander Sa Beike" );
+    ArrayList &lt;String&gt; equipment3 = new ArrayList ();
+    equipment3.add ( "Sa Beike evil sword" );
+    equipment3.add ( "Sa Beike savage sword" );
+    equipment3.add ( "Sa Beike lucky stone" );
+    equipment3.add ( "Mystery gloves" );
+    equipment3.add ( "dye cream gloves" );
+    equipment3.add ( "streamer gloves" );
+    equipment3.add ( "tied Gloves light" );
+    boss3.setEquipment (equipment3);
+    boss3.setDead ( false );
+
+    Boss BOSS4 = new Boss ();
+    boss4.setName ( "Qi Lake" );
+    ArrayList &lt;String&gt; equipment4 = new ArrayList ();
+    equipment4.add ( "Fink scalpel" );
+    equipment4.add ( "Qi Lake of evil blood potion" );
+    equipment4.add ( "Roger brown diamond signet ring" );
+    equipment4.add ( "Said co-Ming Ring" );
+    equipment4.add ( "Blood spine Ring" );
+    boss4.setEquipment (equipment4);
+    boss4.setDead ( false );
+
+
+    Boss boss5 = new Boss ();
+    boss5.setName ( "iron off by Al Gore Mountain" );
+    ArrayList &lt;String&gt; equipment5 = new ArrayList ();
+    equipment5.add ( "Sinopec hammer" );
+    equipment5.add ( "Union blade cloak" );
+    equipment5.add ( "Marksman cloak" );
+    equipment5.add ( "Violence harmony cloak" );
+    equipment5.add ( "evil bone cloak" );
+    equipment5.add ( "arcane cloak" );
+    boss5.setEquipment (equipment5);
+    boss5.setDead ( false );
+
+
+    // Instantiate BOSS collection 
+    ArrayList &lt;Boss&gt; Bosses = new ArrayList ();
+    bosses.add (boss1);
+    bosses.add (boss2);
+    bosses.add (boss3);
+    bosses.add (boss4);
+    bosses.add (boss5);
+    // Set Boss collection
+    wowhfb.setBosses (bosses);
+
+    return wowhfb;
+}
+
+
+// Fighting process 
+public  void  startFB ( int massageStartWhat, int massageEndWhat, int sleep)  {
+     // random number ready 
+    Random random = new Random ();
+     // add collection management thread [need to be synchronized, that is multiple threads share a collection] 
+    synchronized (Object) {
+        hashSet.add ( this );
+    }
+    // Start the copy, using ThreadLocal isolation WOWHFB objects 
+    ThreadLocal &lt;WOWHFB&gt; threadLocal = new ThreadLocal () {
+         // initialization copy 
+        Override 
+        protected Object initialValue ()  {
+             return wowhfb;
+        }
+    };
+    // Send the battle ...... message
+    Message messageStart = handlerMain.obtainMessage ();
+    messageStart.what = massageStartWhat;
+    messageStart.sendToTarget ();
+    try {
+        Thread.sleep (sleep);
+    } catch (InterruptedException e) {
+        e.printStackTrace ();
+    }
+    // End the fighting Usage threadLocal.get () took a copy of the object]
+    WOWHFB temp = threadLocal.get ();
+    // Kill the N-boss [Random] 
+    int bossDead = random.nextInt (temp.getBosses () size () -. 1 );
+    bossDead ++;
+    // Trophy 
+    ArrayList &lt;String&gt; result = new ArrayList ();
+     for ( int i = 0 ; i &lt;bossDead; i ++) {
+        temp.getBosses () get (i) .setDead (. true );
+         // random get equipment 
+        int randomTempIndex = random.nextInt (temp.getBosses () get (i) .getEquipment () size ()..);
+        result.add (. temp.getBosses () get (i) .getEquipment () get (randomTempIndex).);
+    }
+    // Gathering information 
+    Final StringBuffer stringBuffer = new StringBuffer ();
+     // judge clan 
+    switch (massageStartWhat) {
+         Case START_1:
+            StringBuffer.append ( "clan *** *** 1 kill BOSS" );
+             break ;
+         Case START_2:
+            StringBuffer.append ( "clan *** 2 *** BOSS kill" );
+             break ;
+         Case START_3:
+            StringBuffer.append ( "clan *** *** 3 killed BOSS" );
+             break ;
+    }
+    StringBuffer.append ( "\ r \ N" );
+
+    // Collected killed Boss name 
+    for ( int i = 0 ; i &lt;temp.getBosses () size ();. i ++) {
+         if (. temp.getBosses () get (i) .isDead ()) {
+            stringBuffer.append (temp.getBosses () get (i) .getName ().);
+            StringBuffer.append ( "\ r \ N" );
+        }
+    }
+    // Kill the Boss collection equipment 
+    StringBuffer.append ( "booty *** ***" );
+    StringBuffer.append ( "\ r \ N" );
+     for ( int i = 0 ; i &lt;result.size (); i ++) {
+        stringBuffer.append (result.get (i));
+        StringBuffer.append ( "\ r \ N" );
+    }
+    Thread {// Add a collection management need to be synchronized, that is multiple threads share a collection} 
+    synchronized (Object) {
+        hashSet.remove ( this );
+    }
+    // Send the fighting ended message
+    Message messageEnd = handlerMain.obtainMessage ();
+    messageEnd.what = massageEndWhat;
+    messageEnd.obj = stringBuffer;
+    messageEnd.sendToTarget ();
+}
+// Reset The copy 
+public  void  REFB ()  {
+     // determine whether all the threads end 
+    if (hashSet.isEmpty ()) {
+        button1.setEnabled ( true );
+         // Here we must note that the ThreadLocal object does not clone program to clone multiple copies of an object 
+        // copy of the object is actually still is one, so after the end of all threads, you need to reset the copy of the object
+        wowhfb = initWowhfb ();
+    }
+}
+
+
+Team 1 // 
+Runnable runnable1 = new Runnable () {
+     Override 
+    public  void  run ()  {
+
+        startFB (START_1, END_1, new Random () nextInt (. five thousand ) + eight thousand );
+    }
+};
+
+Team 2 // 
+Runnable runnable2 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        startFB (START_2, END_2, new Random () nextInt (. five thousand ) + eight thousand );
+
+    }
+};
+
+// Clan 3 
+Runnable runnable3 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        startFB (START_3, END_3, new Random () nextInt (. five thousand ) + eight thousand );
+    }
+};
+
+public  void  btn1 (View View)  {
+
+    // Start 
+    new Thread (runnable1) .start ();
+     new Thread (runnable2) .start ();
+     new Thread (runnable3) .start ();
+    button1.setEnabled ( false );
+}
+
+
+Override 
+public  boolean  onCreateOptionsMenu (Menu menu)  {
+     // Inflate the menu; this adds items to the Action Bar if it is Present.
+    . getMenuInflater () inflate (R.menu.menu_other_activity1, menu);
+    return  true ;
+}
+
+Override 
+public  boolean  onOptionsItemSelected (MenuItem Item)  {
+     // Handle Bar Action Item Clicks here. The Action Bar Will 
+    // Automatically handle Clicks on the Home / Up button, so Long 
+    as you // Specify a parent Activity in AndroidManifest.xml. 
+    int ID = item.getItemId ();
+
+    // Noinspection SimplifiableIfStatement 
+    if (ID == R.id.action_settings) {
+         return  true ;
+    }
+
+    return  Super .onOptionsItemSelected (Item);
+}
+</code></pre>
+
+<p>}</p>
+
+<p>輸入並搜尋
+Android Thread
+Brief introduction
+1. JAVA thread creation
+2. JAVA cyclic thread
+3. Thread Synchronization JAVA
+4. JAVA thread object copy ThreadLocal
+5. JAVA thread pool
+6. Android messaging
+7. Android messaging communication thread between the thread
+8. Android asynchronous task AsyncTask
+This book uses GitBook release
+Android Thread
+JAVA thread pool [ExecutorService]
+Thread pool functions:</p>
+
+<p>  Thread pool function is to limit the number of system execution threads.</p>
+
+<p>  According to the environmental situation of the system, you can automatically or manually set the number of threads, to achieve the best results run; less waste system resources, cause the system more crowded inefficient. Control the number of threads with the thread pool, other threads waiting in line. Tasks A task is finished, and then take from the queue in front of the start of execution. If the queue does not wait for the process, the resources of the thread pool is waiting. When a new task needs to be run, if the thread pool worker threads have to wait, you can start running; otherwise enter the queue.</p>
+
+<p>Why use a thread pool:</p>
+
+<p>Reduce the number of creating and destroying threads, each worker thread can be reused, perform multiple tasks.</p>
+
+<p>According to the capacity of the system, adjust the number of thread pool threads work line to prevent because consuming too much memory, and the server so tired (each thread needs about 1MB of memory, the thread open, the more memory consumption also the greater the last crash).</p>
+
+<p>JAVA inside thread pool</p>
+
+<p>  Top-level interface Java inside the thread pool is Executor, but is not a strict sense Executor thread pools, but only one thread of execution tool. The real thread pool interface ExecutorService.</p>
+
+<p>  Java offers four thread pool by Executors, respectively:</p>
+
+<p>newCachedThreadPool create a cached thread pool. If the size of the thread pool exceeds the thread processing tasks required, it will idle recovery section (60 seconds does not perform the task) threads, while increasing the number of tasks, this thread pool and you can add a new thread to handle intelligent tasks. This thread pool thread pool size do not limit the size of the thread pool thread is entirely dependent on the maximum size of the operating system (or JVM) that can be created.</p>
+
+<p>newFixedThreadPool create fixed-size thread pool. Each time you submit a task to create a thread, until the thread reaches the maximum size of the thread pool. Once the size of the thread pool reaches the maximum will remain unchanged, because if a thread end execution exception, the thread pool will add a new thread.</p>
+
+<p>newScheduledThreadPool create a thread pool size unlimited. This thread pool to support timing and demand periodically perform a task.</p>
+
+<p>newSingleThreadExecutor create a single-threaded thread pool. This thread pool is only one thread at work, which is equivalent to a single-threaded serial execution of all tasks. If this unique thread because abnormal end, then there will be a new thread to replace it. This thread pool to ensure the implementation of all tasks in accordance with the order submitted by the task sequence.</p>
+
+<p>Creating a Thread Pool</p>
+
+<p>Executor interface
+ExecutorService Interface
+Executors class static method to configure the thread pool
+Case</p>
+
+<p>Package com.hzj163.myexecutorservice;
+ Import android.os.Handler;
+ Import android.os.Message;
+ Import android.support.v7.app.AppCompatActivity;
+ Import android.os.Bundle;
+ Import android.view.View;
+ Import android.widget .TextView;
+ Import java.lang.ref.WeakReference;
+ Import java.util.concurrent.ExecutorService;
+ Import java.util.concurrent.Executors;
+ Import java.util.concurrent.ScheduledExecutorService;
+ Import java.util.concurrent.TimeUnit;
+ public  class  MainActivity  extends  AppCompatActivity  {</p>
+
+<pre><code>TextView textView1;
+TextView textView2;
+TextView textView3;
+TextView textView4;
+TextView textView5;
+TextView textView6;
+TextView textView7;
+TextView textView8;
+TextView textView9;
+TextView textView10;
+
+protected  void  onCreate (Bundle savedInstanceState)  {
+     Super .onCreate (savedInstanceState);
+    setContentView (R.layout.activity_main);
+    textView1 = (TextView) findViewById (R.id.textView1);
+    textView2 = (TextView) findViewById (R.id.textView2);
+    textView3 = (TextView) findViewById (R.id.textView3);
+    textView4 = (TextView) findViewById (R.id.textView4);
+    textView5 = (TextView) findViewById (R.id.textView5);
+    textView6 = (TextView) findViewById (R.id.textView6);
+    textView7 = (TextView) findViewById (R.id.textView7);
+    textView8 = (TextView) findViewById (R.id.textView8);
+    textView9 = (TextView) findViewById (R.id.textView9);
+    textView10 = (TextView) findViewById (R.id.textView10);
+}
+
+// Messaging 
+MyHandler handler = new MyHandler ( new WeakReference &lt;MainActivity&gt; (MainActivity. this ));
+ static  class  MyHandler  extends  Handler  {
+    WeakReference &lt;MainActivity&gt; weakReference;
+
+    public  MyHandler (WeakReference &lt;MainActivity&gt; WeakReference)  {
+         this .weakReference = WeakReference;
+    }
+
+    Override 
+    public  void  handleMessage (Message msg)  {
+        MainActivity temp = weakReference.get ();
+
+        switch (msg.what) {
+             Case  1 :
+                temp.textView1.setText (msg.obj.toString ());
+                break ;
+             Case  2 :
+                temp.textView2.setText (msg.obj.toString ());
+                break ;
+             Case  3 :
+                temp.textView3.setText (msg.obj.toString ());
+                break ;
+             Case  4 :
+                temp.textView4.setText (msg.obj.toString ());
+                break ;
+             Case  5 :
+                temp.textView5.setText (msg.obj.toString ());
+                break ;
+             Case  6 :
+                temp.textView6.setText (msg.obj.toString ());
+                break ;
+             Case  7 :
+                temp.textView7.setText (msg.obj.toString ());
+                break ;
+             Case  8 :
+                temp.textView8.setText (msg.obj.toString ());
+                break ;
+             Case  9 :
+                temp.textView9.setText (msg.obj.toString ());
+                break ;
+             Case  10 :
+                temp.textView10.setText (msg.obj.toString ());
+                break ;
+        }
+    }
+}
+
+// Thread business 
+public  void  myServer ( int What)  {
+     for ( int i = 0 ; i &lt; 10 ; i ++) {
+         try {
+            Thread.sleep ( 1000 );
+        } catch (InterruptedException e) {
+            e.printStackTrace ();
+        }
+        Message message = handler.obtainMessage ();
+        message.what = what;
+        message.obj = i;
+        message.sendToTarget ();
+    }
+}
+
+// No. 1 Thread 
+Runnable runnable1 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        myServer ( 1 );
+    }
+};
+No. // 2 thread 
+Runnable runnable2 = new Runnable () {
+     Override 
+    public  void  run ()  {
+
+        myServer ( 2 );
+    }
+};
+// The 3rd thread 
+Runnable runnable3 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        myServer ( 3 );
+    }
+};
+
+No. 4 threads // 
+Runnable runnable4 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        myServer ( 4 );
+    }
+};
+
+No. 5 thread // 
+Runnable runnable5 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        myServer ( 5 );
+    }
+};
+No. 6 // thread 
+Runnable runnable6 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        myServer ( 6 );
+    }
+};
+// 7 thread 
+Runnable runnable7 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        myServer ( 7 );
+    }
+};
+No. 8 threads // 
+Runnable runnable8 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        myServer ( 8 );
+    }
+};
+// 9 Thread 
+Runnable runnable9 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        myServer ( 9 );
+    }
+};
+No. // 10 thread 
+Runnable runnable10 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        myServer ( 10 );
+    }
+};
+
+// Open plan common thread 
+public  void  btn1 (View View)  {
+     new Thread (runnable1) .start ();
+     new Thread (runnable2) .start ();
+     new Thread (runnable3) .start ();
+     new Thread (runnable4). Start ();
+     new Thread (runnable5) .start ();
+     new Thread (runnable6) .start ();
+     new Thread (runnable7) .start ();
+     new Thread (runnable8) .start ();
+     new Thread (runnable9). Start ();
+     new Thread (runnable10) .start ();
+}
+
+// Create a single worker thread Executor, with unbounded queue to run this thread. 
+public  void  btn2 (View View)  {
+    threadExecute (Executors.newSingleThreadExecutor ());
+}
+
+// Create a reusable fixed number of threads the thread pool, shared unbounded queue, to run these threads. 
+public  void  btn3 (View View)  {
+    ExecutorService ExecutorService = Executors.newFixedThreadPool ( 4 );
+    threadExecute (executorService);
+}
+// Create a thread pool that creates new threads as needed, but at the time previously constructed threads available to reuse them 
+public  void  btn4 ​​(View View)  {
+    ExecutorService executorService = Executors.newCachedThreadPool ();
+    threadExecute (executorService);
+}
+
+// Create a thread pool that can schedule commands to run after a given delay, or to execute periodically. 
+public  void  btn5 (View View)  {
+    ScheduledExecutorService ExecutorService = Executors.newScheduledThreadPool ( 5 );
+    executorService.schedule (runnable1, 1000 , TimeUnit.MILLISECONDS);
+    executorService.schedule (runnable2, 1000 , TimeUnit.MILLISECONDS);
+    executorService.schedule (runnable3, 1000 , TimeUnit.MILLISECONDS);
+    executorService.schedule (runnable4, 1000 , TimeUnit.MILLISECONDS);
+    executorService.schedule (runnable5, 1000 , TimeUnit.MILLISECONDS);
+    executorService.schedule (runnable6, 1000 , TimeUnit.MILLISECONDS);
+    executorService.schedule (runnable7, 1000 , TimeUnit.MILLISECONDS);
+    executorService.schedule (runnable8, 1000 , TimeUnit.MILLISECONDS);
+    executorService.schedule (runnable9, 1000 , TimeUnit.MILLISECONDS);
+    executorService.schedule (runnable10, 1000 , TimeUnit.MILLISECONDS);
+}
+
+
+// Execute thread pool 
+public  void  threadExecute (ExecutorService ExecutorService)  {
+    executorService.execute (runnable1);
+    executorService.execute (runnable2);
+    executorService.execute (runnable3);
+    executorService.execute (runnable4);
+    executorService.execute (runnable5);
+    executorService.execute (runnable6);
+    executorService.execute (runnable7);
+    executorService.execute (runnable8);
+    executorService.execute (runnable9);
+    executorService.execute (runnable10);
+}
+</code></pre>
+
+<p>}</p>
+
+<p>輸入並搜尋
+Android Thread
+Brief introduction
+1. JAVA thread creation
+2. JAVA cyclic thread
+3. Thread Synchronization JAVA
+4. JAVA thread object copy ThreadLocal
+5. JAVA thread pool
+6. Android messaging
+7. Android messaging communication thread between the thread
+8. Android asynchronous task AsyncTask
+This book uses GitBook release
+Android Thread
+Android messaging
+  Android UI active as the main thread, can not exceed 5 seconds time-consuming task, and all ViewGroup View and can only run on the main UI thread. If View or ViewGroup run in the second thread will throw [Only the original thread that created a view hierarchy can touch its views], it will be to solve the communication problems between the thread and thread through message mechanism in android</p>
+
+<p>Communication between threads and threads, android adopt messaging</p>
+
+<p>Android message mechanism consists of the following components:</p>
+
+<p>Handler
+Message
+MessageQueue
+Looper</p>
+
+<p>Handler</p>
+
+<p>  What is the handler? handler played on MQ to add messages and process messages role (processing only messages issued by himself), MQ notify it to perform a task (sendMessage), and in their own time loop to perform the task (handleMessage), whole process is asynchronous. handler will be associated with the creation of a looper, default constructor method associated with the current thread looper, but it also can be set in.</p>
+
+<p>  handler must be associated with a loop thread can play a role, Android UI is associated with a main thread and thread Loop, but we custom-defined thread must open the Loop</p>
+
+<p>Handler has the following two important features:</p>
+
+<p>handler can send messages in any thread, these messages will be added to the MQ associated.</p>
+
+<p>handler is to process messages in the looper thread in which it is associated.</p>
+
+<p>Send Message Handler</p>
+
+<p>  With after handler, we can use post (Runnable), postAtTime (Runnable, long), postDelayed (Runnable, long), sendEmptyMessage (int), sendMessage (Message), sendMessageAtTime (Message, long) and sendMessageDelayed (Message, long ) The method sends MQ on the news. Just look at these API you may feel handler can send two messages, one is Runnable object, one is message object, which is intuitive to understand, but in fact issued last post Runnable objects are encapsulated into a message objects.</p>
+
+<p>send a callback program needs to send a message [to receive news]</p>
+
+<p>sendMessage () Message sent immediately to the message queue
+sendMessageAtFrontOfQueue () Message immediately sent to the queue, and is on the front of the queue
+sendMessageAtTime () to set the time, to send the Message Queue
+sendMessageDelayed () after a delay of several milliseconds, send Message to the queue
+post program sends a message [direct binding handler current thread of execution, need Runnable objects]</p>
+
+<p>post () Message sent immediately to the message queue
+postAtFrontOfQueue () Message immediately sent to the queue, and is on the front of the queue
+postAtTime () to set the time, to send the Message Queue
+postDelayed () after a delay of several milliseconds, send Message to the queue
+Activity object has a method runOnUiThread () method is actually the handler's post</p>
+
+<p>Case</p>
+
+<p>send the program to send a message, do not use the Message object encapsulates the message</p>
+
+<pre><code>// Handler object instantiation 
+Handler handler = new Handler ()
+{
+    Override 
+    public  void  handleMessage (Message msg)  {
+        Log.i ( "HZJ" , "receive the message:" + msg.what);
+    }
+};
+public  void  btn1 (View View)  {
+     // send messages using Message message encapsulation object does not display 
+    handler.sendEmptyMessage ( 1 );
+}
+</code></pre>
+
+<p>send the program to send a message, use the Message object encapsulates the message</p>
+
+<pre><code>// Handler object instantiation 
+Handler handler = new Handler ()
+{
+    Override 
+    public  void  handleMessage (Message msg)  {
+        Log.i ( "HZJ" , "receive the message:" + msg.what);
+        Log.i ( "HZJ" , "arg1 receive the message:" + msg.arg1);
+        Log.i ( "HZJ" , "arg2 receive the message:" + msg.arg2);
+    }
+};
+public  void  btn1 (View View)  {
+     // send the message, the message encapsulated objects using Message 
+    Message message = new Message ();
+     // message type 
+    message.what = 1 ;
+     // message can carry two simple integer data 
+    // message Data 1 
+    message.arg1 = 111 ;
+     // message data 2 
+    message.arg2 = 222 ;
+     // send message
+    handler.sendMessage (message);
+}
+</code></pre>
+
+<p>send the program to send a message, use the Message object encapsulates the message, and the message</p>
+
+<pre><code>// Handler object instantiation 
+Handler handler = new Handler ()
+{
+    Override 
+    public  void  handleMessage (Message msg)  {
+        Log.i ( "HZJ" , "receive the message:" + msg.what);
+        Log.i ( "HZJ" , "arg1 receive the message:" + msg.arg1);
+        Log.i ( "HZJ" , "arg2 receive the message:" + msg.arg2);
+    }
+};
+public  void  btn1 (View View)  {
+     // send a message, send a message using the Message object 
+    // Message object acquired as handler.obtainMessage (); instead direct new, so that efficiency will be higher, saving memory resources
+    Message message = handler.obtainMessage ();
+    // Message type 
+    message.what = 1 ;
+     // message can carry two simple integer data 
+    // message data 1 
+    message.arg1 = 111 ;
+     // message data 2 
+    message.arg2 = 222 ;
+     // send messages, where the use the sendToTarget message object (); method
+    message.sendToTarget ();
+}
+</code></pre>
+
+<p>post program sends a message</p>
+
+<p>public  class  F4  extends  Fragment  {
+    Button button1;
+    View view;
+    public  F4 ()  {</p>
+
+<pre><code>}
+// Second thread 
+Runnable Runnable = new Runnable () {
+     Override 
+    public  void  run ()  {
+         // Since the runnable object using handler.post (Runnable); 
+        // Also, because the main thread UI handler created 
+        // therefore runnable object run method executes in the main thread UI 
+        Log.i ( "HZJ" , Thread.currentThread () getName () +. "-----" );
+    }
+};
+// Handler object instantiation 
+Handler handler = new Handler ()
+{
+    Override 
+    public  void  handleMessage (Message msg)  {
+         // Note the use handler.post way, here for less than a message
+    }
+};
+public  void  btn1 (View View)  {
+     // send the message 
+    // post series to send a message directly to the object will execute runnable threads directly in the handler object is located inside the run method 
+    // so here post of runnable objects inside the run method is actually in Inside the main UI thread execution 
+    // Here it does not need to use the callback method to get the message object handleMessage also get less
+    handler.post (runnable);
+}
+
+Override 
+public View onCreateView (LayoutInflater inflater, ViewGroup Container,
+                         Bundle savedInstanceState)  {
+
+    if (View == null ) {
+        View = Inflater.inflate (R.layout.fragment_f4, Container, false );
+        button1 = (Button) view.findViewById (R.id.button1);
+        button1.setOnClickListener ( new View.OnClickListener () {
+             Override 
+            public  void  onClick (View v)  {
+                btn1 (v);
+            }
+        });
+
+    }
+    return View;
+}
+</code></pre>
+
+<p>}
+Message Handler Processing</p>
+
+<p>  Process messages via callback handleMessage (Message msg) complete, of course, send the program needs to be used to send messages to the callback handler</p>
+
+<pre><code>// Handler object starts waiting for news 
+Handler handler = new Handler () {
+     Override 
+    public  void  handleMessage (Message msg)  {
+         // receive a message to change the UI
+        textView1.setText (msg.obj.toString ());
+    }
+};
+</code></pre>
+
+<p>Secondary thread creating Handler objects</p>
+
+<p>Package com.hzj163.mythread;
+ Import android.os.Handler;
+ Import android.os.Looper;</p>
+
+<p>public  class  Thread1  implements  Runnable  {</p>
+
+<pre><code>Handler handler;
+Override 
+public  void  run ()  {
+     // Looper ready
+    Looper.prepare ();
+    // Instantiate secondary thread Handler object, you must open Looper 
+    // main examples of UI Handler objects do not need to open Looper, because the main thread UI and opened Looper 
+    handler = new Handler ();
+     // Looper cycle
+    Looper.loop ();
+}
+</code></pre>
+
+<p>}
+Adt20 update to developers who might find such a warning on the handler: This Handler class should be static or leaks might occur.</p>
+
+<p>  First ADT 20 Changes we can find such a change: New Lint Checks: Look for handler leaks: This check makes sure that a handler inner class does not hold an implicit reference to its outer class.</p>
+
+<p>  Translation is, Lint will add a check items namely: to ensure that the internal handler class does not contain an implicit reference to the outer class. Share a handler under a looper thread objects, the message handler retained for reference, as long as there is a message in the queue, then the handler can not be recovered, if handler is not static then use the Handler of Service and Activity will also not be recovered . This may lead to memory leaks. Of course, this usually does not happen unless you send a long message delays.</p>
+
+<p>  The official recommended to static class handler, and use weak references inside WeakReference</p>
+
+<p>Case</p>
+
+<p>Package com.hzj163.mythread;
+ Import android.os.Bundle;
+ Import android.os.Handler;
+ Import android.os.Message;
+ Import android.support.v4.app.Fragment;
+ Import android.view.LayoutInflater;
+ Import android.view .view;
+ Import android.view.ViewGroup;
+ Import android.widget.Button;
+ Import java.lang.ref.WeakReference;</p>
+
+<p>public  class  F4  extends  Fragment  {
+    Button button1;
+    View view;
+    public  F4 ()  {
+    }
+    // Handler object static inner class 
+    static  class  MyHandler  extends  Handler  {
+         // use weak references refer to external class
+        WeakReference  weakReference;</p>
+
+<pre><code>    // Obtain an instance by constructing 
+    public  MyHandler (WeakReference &lt;F4&gt; WeakReference)  {
+         this .weakReference = WeakReference;
+    }
+    Override 
+    public  void  handleMessage (Message msg)  {
+         // update the main UI components 
+        using a weak reference object // get method to get the external object
+        F4 temp = weakReference.get ();
+        temp.button1.setText ( "xxxx" );
+    }
+}
+// Handler object instantiation 
+MyHandler handler = new MyHandler ( new WeakReference &lt;F4&gt; ( this ));
+ // message 
+public  void  btn1 (View View)  {
+    Message message = handler.obtainMessage ();
+    message.sendToTarget ();
+}
+
+Override 
+public View onCreateView (LayoutInflater inflater, ViewGroup Container,
+                         Bundle savedInstanceState)  {
+
+    if (View == null ) {
+        View = Inflater.inflate (R.layout.fragment_f4, Container, false );
+        button1 = (Button) view.findViewById (R.id.button1);
+        button1.setOnClickListener ( new View.OnClickListener () {
+             Override 
+            public  void  onClick (View v)  {
+                btn1 (v);
+            }
+        });
+    }
+    return View;
+}
+</code></pre>
+
+<p>}
+Message</p>
+
+<p>  In the entire message processing mechanism, message called task, encapsulates the information and handler task treating the task of carrying. message usage is relatively simple.</p>
+
+<p>Although there are public Message default constructor, but you should () to get empty message object from a message pool by Message.obtain, to save resources.</p>
+
+<p>If you only need to carry a simple message int information, priority Message.arg1 and Message.arg2 to convey information, which is more provincial than the Bundle memory</p>
+
+<p>Message.what to identify unauthorized information in order to process message in different ways.</p>
+
+<p>Looper</p>
+
+<p>  Looper literally means "those who cycle", which is designed to enable a common thread becomes Looper thread. Looper thread is the so-called cycle work thread. Program development (especially GUI development), we often need a continuous cycle of threads, once there is a new task is executed, executing the task continues to wait for the next, which is Looper thread. Create Looper Looper thread class is simple:</p>
+
+<p>public  class  LooperThread  extends  Thread  {
+     Override 
+    public  void  run ()  {
+         // initialize the current thread to Looper thread
+        Looper.prepare ();</p>
+
+<pre><code>    // ... Other treatments, such as instantiation handler
+
+    // Begin loop processing the message queue
+    Looper.loop ();
+}
+</code></pre>
+
+<p>}</p>
+
+<p>  Looper is now a subject of your thread, its internal maintains a message queue MQ. Note that a Thread can have only one Looper objects</p>
+
+<p>  prepare () the core is defined as the looper objects ThreadLocal.</p>
+
+<p>  loop (); after calling loop method, Looper thread began to really work, and it continues to remove the team from his head MQ messages (also called task).</p>
+
+<p>  In addition to prepare () and loop () method, Looper class also provides some useful methods, such as</p>
+
+<p>Looper.myLooper () to get the current thread looper objects
+getThread () to get the object belongs looper thread
+quit () method to end looper loop
+About Looper summary points:</p>
+
+<p>Each thread has one and can only have a Looper object, which is a ThreadLocal
+Looper has an internal message queue, loop () method after calling thread began to remove the message from the queue to perform
+Looper Looper make a thread into a thread.
+MessageQueue</p>
+
+<p>  Message Queue (Message Queue), but MQ is encapsulated into Looper inside, we do not deal directly with MQ</p>
+
+<p>'</p>
+
+<p>輸入並搜尋
+Android Thread
+Brief introduction
+1. JAVA thread creation
+2. JAVA cyclic thread
+3. Thread Synchronization JAVA
+4. JAVA thread object copy ThreadLocal
+5. JAVA thread pool
+6. Android messaging
+7. Android messaging communication thread between the thread
+8. Android asynchronous task AsyncTask
+This book uses GitBook release
+Android Thread
+Handler main thread delay implementation of the program
+  Here are some of the use of each APP APP interface products interlude cases, delay in the description of the main thread execution, but does not block the main thread is the handler of message mechanism mainly used to send a message in the post way.</p>
+
+<p>Case</p>
+
+<p>public  class  WelcomeActivity  extends  AppCompatActivity  {</p>
+
+<pre><code>// Create Handler object in the main thread 
+Handler handler = new Handler ();
+ Override 
+protected  void  onCreate (Bundle savedInstanceState)  {
+     Super .onCreate (savedInstanceState);
+    setContentView (R.layout.activity_main);
+    // Use postDelayed delay 5000 execution method, so it will not block the main thread 
+    handler.postDelayed ( new Runnable () {
+         Override 
+        public  void  run ()  {
+             // here is still the main thread 
+            // jump to other Activity 
+            Intent Intent = new Intent ( "com.hzj163.myhandler.MainActivity" );
+            startActivity (intent);
+            finish ();
+        }
+    }, 5000 );
+}
+</code></pre>
+
+<p>}
+Handler communication between threads and threads
+  In the second thread is instantiated Handler must ensure that secondary thread opened Looper otherwise trigger Can not create handler inside thread that has not called Looper.prepare ()</p>
+
+<p>Case</p>
+
+<p>Package com.hzj163.myhandler;</p>
+
+<p>Import android.os.Handler;
+ Import android.os.Looper;
+ Import android.os.Message;
+ Import android.support.v4.app.INotificationSideChannel;
+ Import android.support.v7.app.ActionBar;
+ Import android.support.v7. app.AppCompatActivity;
+ Import android.os.Bundle;
+ Import android.util.Log;
+ Import android.view.Menu;
+ Import android.view.MenuItem;
+ Import android.view.SurfaceView;
+ Import android.view.View;
+ Import android.widget .TextView;</p>
+
+<p>Import java.util.Timer;
+ Import java.util.TimerTask;
+ public  class  MainActivity  extends  AppCompatActivity  {
+    TextView textView2;
+    int a = 900 ;
+     Override 
+    protected  void  onCreate (Bundle savedInstanceState)  {
+         Super .onCreate (savedInstanceState);
+        setContentView (R.layout.activity_main2);
+        textView2 = (TextView) findViewById (R.id.textView2);
+        // Start the secondary thread 1, ready to receive a message waiting for 
+        new Thread (runnable1) .start ();
+    }</p>
+
+<pre><code>// Main thread Handler object 
+Handler handlerMain = new Handler ();
+ // second thread Handler objects
+Handler handlerThread;
+// Secondary thread 1, is responsible for receiving messages 
+in the second thread 1 // Internal run method instantiates Handler object HandlerThread 
+Runnable runnable1 = new Runnable () {
+     Override 
+    public  void  run ()  {
+         // Looper ready
+        Looper.prepare ();
+        // Instantiate handlerThread, only in the run inside an instance method of handlerThread valid 
+        HandlerThread = new Handler () {
+             // callback handleMessage prepared to accept the message 
+            Override 
+            public  void  handleMessage (Message msg)  {
+                Log.i ( "HZJ" , "began the received message Thread:" + Thread.currentThread () getName ().);
+                 Final  int temp = msg.arg1;
+                 // perform the update using the main UI thread is the main thread of handlerMain objects 
+                handlerMain. post ( new Runnable () {
+                     Override 
+                    public  void  run ()  {
+                         // update the UI 
+                        textView2.setText ( "a: =" + temp);
+                    }
+                });
+            }
+        };
+        // Looper start the cycle
+        Looper.loop ();
+    }
+};
+// Thread 2: Mainly responsible for sending a message, send a message to the thread 1, so need to use handlerThread object to a message 
+Runnable runnable2 = new Runnable () {
+     Override 
+    public  void  run ()  {
+        Log.i ( "HZJ" , "develop a message: Thread:" + Thread.currentThread () getName ().);
+        a = 1000 ;
+         // create a message object HandlerThread, because at times the thread 1 handlerThread
+        Message message = handlerThread.obtainMessage ();
+        message.arg1 = a;
+        // Send messages, thread 1 handlerThread to receive news, reaching the thread 2 and thread communication
+        message.sendToTarget ();
+    }
+};
+
+public  void  btn2 (View View)  {
+     // interaction between threads and thread 
+    // open thread 2, start sending a message to the thread 1 
+    new Thread (runnable2) .start ();
+}
+
+Override 
+protected  void  onDestroy ()  {
+
+    // Note that you need to close the secondary thread Looper 1 
+    if (HandlerThread! = null ) {
+         // close of the thread Looper 1
+        handlerThread.getLooper () quit ().;
+    }
+    Super .onDestroy ();
+}
+</code></pre>
+
+<p>}</p>
+
+<p>輸入並搜尋
+Android Thread
+Brief introduction
+1. JAVA thread creation
+2. JAVA cyclic thread
+3. Thread Synchronization JAVA
+4. JAVA thread object copy ThreadLocal
+5. JAVA thread pool
+6. Android messaging
+7. Android messaging communication thread between the thread
+8. Android asynchronous task AsyncTask
+This book uses GitBook release
+Android Thread
+AsyncTask
+  AsyncTask is Android 1.5 Cubake join a class to implement asynchronous operations, before only with Java SE library Thread to achieve multi-threaded asynchronous, AsyncTask Android platform is its asynchronous tools, into the characteristics of the Android platform, Let asynchronous operation more secure, convenient and practical. It is also essentially a wrapper for Java SE library Thread, coupled with the platform-dependent features, so for all multi-threaded asynchronous strongly recommended to use AsyncTask, because it takes into account, but also into the characteristics of the Android platform is more secure and efficient.</p>
+
+<p>  AsyncTask can easily perform asynchronous operations (doInBackground), but also easy to communicate with the main thread, which itself and good encapsulation, can cancel the operation (cancel ()).</p>
+
+<p>  AsyncTask objects can not be reused, meaning that a AsyncTask object can only execute () once, or there will be an exception is thrown "java.lang.IllegalStateException: Can not execute task: the task is already running"</p>
+
+<p>Previous version Android2.3, namely SDK / 10 and previous versions of API</p>
+
+<p>Internal thread pool limit is 5, which means that while there are only five threads running over the threads can only wait, wait in front of the thread was only an execution schedule and run over. In other words, if AsyncTask number of instances of a process of more than five, so if the previous five runs for a long time, then wait for the first six only chance. This is a limitation AsyncTask, but also for the previous version 2.3 can not be solved. If your application requires a lot of background thread to perform the task, then you can give up the use AsyncTask, create your own thread pool to manage Thread, or simply do not directly use the thread pool Thread it anyway. Have to say, though relatively Thread AsyncTask more convenient to use, but it can only run five threads simultaneously, which greatly limited its strength, you have to be careful to design your application, use staggered AsyncTask time, try to do time-sharing, or ensure that the number is not more than five, otherwise we may encounter problems mentioned above.
+Android 3.0 later, that SDK / 11 and later versions of API.</p>
+
+<p>Sent some specific changes</p>
+
+<p>execute () submitted task, according to the order that you run only one to say it is in the order of submission, a time to start a thread to perform a task, then run after the completion of the second task, which is the equivalent of only one task background thread executing submitted (Executors.newSingleThreadPool ()).</p>
+
+<p>New interface executeOnExecutor (). This interface allows developers to provide custom thread pool to run and schedule Thread, if you want all the tasks can be run concurrently at the same time, then there is no limit to create a thread pool (Executors.newCachedThreadPool ()), and provided to AsyncTask. Such examples of this AsyncTask had its own thread pool without using AsyncTask default.</p>
+
+<p>Added predefined thread pool THREAD_POOL_EXECUTOR. In fact THREAD_POOL_EXECUTOR not new, before there, but before (Android 2.3) it is AsyncTask private, not public only. THREAD_POOL_EXECUTOR corePoolSize thread pool is a 5, meaning that only a maximum of five threads to run simultaneously, more than five of would wait. So if you use executeOnExecutor (AsyncTask.THREAD_POOL_EXECUTOR) just 2.3 version AsyncTask.execute () effect is the same.</p>
+
+<p>Added predefined thread pool SERIAL_EXECUTOR, its role is to guarantee the order of task execution, that is, it can ensure the task is indeed submitted in accordance with the order execution. Its interior has a queue for storing a job submitted to ensure the current run only one, so that you can ensure the task is in full accordance with the order of execution, the default execute () is used for this, which is executeOnExecutor (AsyncTask.SERIAL_EXECUTOR) and execute () is the same</p>
+
+<p>Note the use of AsyncTask</p>
+
+<p>Overhead thread is very large, while asynchronous processing is also error-prone and difficult to debug, difficult to maintain, so improve your design, as little as possible with asynchronous. For general database queries, a small number of I / O operations are not necessary to start the thread.
+When using AsyncTask have interaction with the main thread, otherwise use Thread</p>
+
+<p>AsyncTask was designed purpose is to meet the specific needs of Android: non-main thread can not operate (UI) components, so AsyncTask extend Thread enhances the ability to interact with the main thread. If your application does not interact with the main thread, then the direct use of Thread enough.</p>
+
+<p>When a large number of threads needed to perform tasks, we must create a thread pool</p>
+
+<p>Overhead thread is very large, especially to create a new thread, otherwise it does not have to design the thread pool like tool. When a large number of threads required to perform tasks, we must create a thread pool using either AsyncTask or Thread, because the use of its internal thread pool AsyncTask quantitative restrictions, may not meet the demand; it is to use Thread thread pool to manage, avoid virtual machine create a large number of threads. For example, batch download pictures from the Internet, you do not want one by one under, or 5 5 download, then create a thread pool CorePoolSize 10 or 20, every 10 or 20 such download is met speed, but not so useless consuming performance overhead to create unlimited threads.</p>
+
+<p>For asynchronous task you want to begin immediately, either directly using the Thread, or create a separate thread pool available to AsyncTask</p>
+
+<p>The default AsyncTask will not necessarily perform your task immediately, unless you offer to give him a separate thread pool. If you do not interact with the main thread, you can directly create a Thread, although the creation of threads overhead is relatively large, but if this is not the batch operation is no problem.</p>
+
+<p>AsyncTask schematic</p>
+
+<p>Case</p>
+
+<p>Package com.hzj163.myasynctask;</p>
+
+<p>Import android.os.AsyncTask;
+ Import android.support.v7.app.AppCompatActivity;
+ Import android.os.Bundle;
+ Import android.view.View;
+ Import android.widget.ProgressBar;
+ Import android.widget.TextView;
+ Import android.widget .Toast;</p>
+
+<p>public  class  MainActivity  extends  AppCompatActivity  {
+    ProgressBar progressBar1;
+    TextView textView1;
+    MyAsyncTask myAsyncTask;
+    // AsyncTask  
+    // URL Params start task execution input parameters, such as HTTP requests 
+    percentage // Progress background tasks. 
+    // Result Results eventual return of background tasks, such as String. 
+    class  MyAsyncTask  extends  AsyncTask &lt; Integer , Integer , String &gt; {
+         // before the main thread begins execution [] [initial work, because in the main UI thread} 
+        // only once 
+        Override 
+        protected  void  onPreExecute ()  {
+            textView1.setText ( "0%" );
+            progressBar1.setMax ( 100 );
+            progressBar1.setProgress ( 0 );
+        }</p>
+
+<pre><code>    // Place the results of [the main thread], generally used for updating UI 
+    // parameters: the implementation of the results 
+    will only be executed once // 
+    Override 
+    protected  void  onPostExecute (String Description)  {
+        Toast.makeText (. MainActivity this , Description, Toast.LENGTH_LONG) .Show ();
+        textView1.setText ( "0%" );
+        progressBar1.setMax ( 100 );
+        progressBar1.setProgress ( 0 );
+    }
+
+    // Background, more time-consuming operations can be placed here. 
+    // Here is the [second thread] 
+    // parameters: thread begins execution when the parameters corresponding to [AsyncTask &lt;Params, Progress, Result&gt; The Params] 
+    // Return: corresponding to [AsyncTask &lt;Params, Progress, Result&gt; in The Result, primarily to onPostExecute Usage 
+    Override 
+    protected String doInBackground (Integer ... params)  {
+         for ( int i = 0 ; i &lt;params [ 0 ]; i ++) {
+             try {
+                Thread.sleep ( 1000 );
+            } catch (InterruptedException e) {
+                e.printStackTrace ();
+            }
+            // PublicProgress (Progress ...) to update the progress of the task.
+            publishProgress (i);
+        }
+        return  "is finished!" ;
+    }
+
+    // You can use a progress bar to increase the user experience. This method is the main thread of execution, for the progress display tasks. 
+    // This is the main thread] [ 
+    //// parameters: thread begins execution when the parameters corresponding to [AsyncTask &lt;Params, Progress, Result&gt; The Params] 
+    Override 
+    protected  void  onProgressUpdate (Integer ... values)  {
+        textView1.setText (values ​​[ 0 ] + "%" );
+        progressBar1.setProgress (values ​​[ 0 ]);
+    }
+
+    // Invoked when the user canceled the main thread to do the operation [] 
+    // only once 
+    Override 
+    protected  void  onCancelled (String Description)  {
+    }
+
+    // Invoked when the user canceled the main thread to do the operation [] 
+    // only once 
+    Override 
+    protected  void  onCancelled ()  {
+    }
+}
+
+public  void  btn1 (View View)  {
+     // instantiate asynchronous tasks 
+    myAsyncTask = new MyAsyncTask ();
+     // begin to perform asynchronous tasks 
+    myAsyncTask.execute ( 100 );
+
+}
+
+Override 
+protected  void  onCreate (Bundle savedInstanceState)  {
+     Super .onCreate (savedInstanceState);
+    setContentView (R.layout.activity_main);
+    progressBar1 = (ProgressBar) findViewById (R.id.progressBar1);
+    textView1 = (TextView) findViewById (R.id.textView1);
+}
+</code></pre>
+
+<p>}</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/shobhit/garrulous-octo-tatertot">Garrulous-octo-tatertot</a> is maintained by <a href="https://github.com/shobhit">shobhit</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
